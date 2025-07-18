@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <title>لعبة السيارات</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: black;
+            text-align: center;
+            padding: 20px;
+        }
+
+        img {
+            width: 400px;
+            margin: 20px auto;
+            border: 3px solid rgb(254, 251, 251);
+            border-radius: 10px;
+            display: block;
+        }
+
+        #choices {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+
+        button {
+            margin: 10px 5px;
+            padding: 10px 20px;
+            font-size: 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            background-color: black;
+            color: antiquewhite;
+            border: 2px solid antiquewhite;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: antiquewhite;
+            color: black;
+        }
+
+        #result {
+            font-size: 22px;
+            font-weight: bold;
+            margin-top: 20px;
+            color: antiquewhite;
+        }
+
+        h2 {
+            color: antiquewhite;
+        }
+
+        #thank-you-screen {
+            display: none;
+            margin-top: 20px;
+            background-color: black;
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+            color: rgb(253, 251, 251);
+            padding: 20px;
+        }
+
+        #thank-you-screen img {
+            width: 150px;
+            height: 150px;
+            object-fit: cover;
+            border-radius: 50%;
+            border: 3px solid antiquewhite;
+            margin-bottom: 15px;
+        }
+
+        #thank-you-screen p {
+            font-size: 20px;
+            color: antiquewhite;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+    <h2 id="question-title">What kind of this car?</h2>
+    <img id="landmark-img" src="" alt="the kind of the car ">
+    <div id="choices"></div>
+    <p id="result"></p>
+    <audio id="correct-sound" src="true somd.mp3"></audio>
+    <audio id="wrong-sound" src="wrong sound.mp3"></audio>
+
+    <div id="thank-you-screen">
+        <img id="developers-photos" src="1a7747e3-41dd-4f11-aebd-b15eb34d739d.jpg" alt="developer photo">
+        <p>thank you for playing this game.</p>
+        <div class="developers-names">
+            <p>made with adham baher</p>
+        </div>
+    </div>
+
+    <script>
+        const questions = [
+            {
+                img: "1999-2003-BMW-X5-4.6is-PLACEMENT2-626x382.jpg",
+                correct: "bmw x5",
+                choices: ["bmw x5", "bmw x1", "bmw x7"]
+            },
+            {
+                img: "bmw-css-7-series-protection-ms-new-standard.jpg",
+                correct: "750i",
+                choices: ["740i", "730i", "750i"]
+            },
+            {
+                img: "77446b64-cbaf-4d5d-8ee6-6d7754a0dcf5.jpg",
+                correct: "nsx",
+                choices: ["accord", "civic", "nsx"]
+            },
+            {
+                img: " Custom Nissan 96' SKYLINE GT-R LM-limited V-spec, An Eye Treat - ModifiedX.jpeg ",
+                correct: "r34",
+                choices: ["r35", "r34", "r33"]
+            },
+            {
+                img: "AMG GT.jpeg",
+                correct: "amg gt",
+                choices: ["c63", "cls", "amg gt"]
+            },
+            {
+                img: "3bf33e5e-cd23-4fa0-8c54-26b071672ba8.jpeg",
+                correct: "amg 1",
+                choices: ["amg 1", "g63", "amg gt"]
+            },
+            {
+                img: "59o1.jpg",
+                correct: "am 1",
+                choices: ["am 1", "g63", "amg gt"]
+            },
+            {
+                img: "BMW-e30-m3.webp",
+                correct: "bmw e30",choices: ["bmw e30", "bmw e46", "bmw e32"]
+            },
+            {
+                img: " BMW🌚.jpeg",
+                correct: "bmw m8",
+                choices: ["bmw m5", "bmw m8", "bmw m3"]
+            },
+            {
+                img: "Spotted under the glow of the streetlights, this….jpeg",
+                correct: "supra mk4",
+                choices: ["supra mk5", "supra mk1", "supra mk4"]
+            },
+            {
+                img: "The Most Expensive Production Car In The World In….jpeg",
+                correct: "clk gtr",
+                choices: ["clk gtr", "clk", "clr gtr"]
+            },
+            {
+                img: "AIStream (@aistream) on Threads.jpeg",
+                correct: "mastang shelby",
+                choices: ["mastang gt", "mastang shelby", "mastang"]
+            },
+            {
+                img: "G 63 MANSORY Tiffany for Sale - Autopoint Nordhausen GmbH - Germany.jpeg",
+                correct: "g63",
+                choices: ["g63", "gls", "glc"]
+            }
+        ];
+
+        let currentQuestionIndex = 0;
+        const landmarkImg = document.getElementById("landmark-img");
+        const choicesDiv = document.getElementById("choices");
+        const resultParagraph = document.getElementById("result");
+        const correctSound = document.getElementById("correct-sound");
+        const wrongSound = document.getElementById("wrong-sound");
+        const thankYouScreen = document.getElementById("thank-you-screen");
+
+        function loadQuestion() {
+            if (currentQuestionIndex < questions.length) {
+                const currentQuestion = questions[currentQuestionIndex];
+                landmarkImg.src = currentQuestion.img;
+                choicesDiv.innerHTML = ''; // مسح الخيارات السابقة
+
+                currentQuestion.choices.forEach(choice => {
+                    const button = document.createElement("button");
+                    button.textContent = choice;
+                    button.onclick = () => checkAnswer(choice === currentQuestion.correct);
+                    choicesDiv.appendChild(button);
+                });
+                resultParagraph.textContent = ''; // مسح النتيجة السابقة
+            } else {
+                // تم الإجابة على جميع الأسئلة، عرض شاشة الشكر
+                document.getElementById("question-title").style.display = 'none';
+                landmarkImg.style.display = 'none';
+                choicesDiv.style.display = 'none';
+                resultParagraph.style.display = 'none';
+                thankYouScreen.style.display = 'block';
+            }
+        }
+
+        function checkAnswer(isCorrect) {
+            if (isCorrect) {
+                resultParagraph.textContent = "true answer!";
+                resultParagraph.style.color = "tan";
+                correctSound.play();
+            } else {
+                resultParagraph.textContent = "wrong answer!";
+                resultParagraph.style.color = "tan";
+                wrongSound.play();
+            }
+
+            // تعطيل الأزرار مؤقتاً لمنع النقرات المتعددة
+            Array.from(choicesDiv.children).forEach(button => {
+                button.disabled = true;
+            });
+
+            setTimeout(() => {
+                currentQuestionIndex++;
+                loadQuestion();
+            }, 2000); // الانتظار لمدة ثانيتين قبل تحميل السؤال التالي
+        }
+
+        // التحميل الأولي لبدء اللعبة
+        loadQuestion();
+    </script>
+</body>
+</html>
